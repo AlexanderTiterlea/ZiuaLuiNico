@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La mulți ani, Nico!</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Comic Sans MS', cursive, sans-serif; background: linear-gradient(135deg, #ffb6c1, #ff69b4); overflow:hidden; }
+    .scene { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0; transition:opacity 1s ease-in-out; }
+    .scene.active { opacity:1; z-index:2; }
+    h1, h2 { color:white; text-shadow: 10px 10px 20px rgba(0,0,0,0.6); animation: popIn 1s ease forwards; text-align:center; }
+    @keyframes popIn { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+    button { background:rgba(255,255,255,0.2); border:2px solid white; color:white; padding:15px 25px; margin-top:20px; font-size:1.2em; border-radius:50px; cursor:pointer; transition:0.3s; }
+    button:hover { background:white; color:#ff69b4; }
+    .bottom-left { position:absolute; bottom:20px; left:20px; }
+    img { max-width:250px; border-radius:20px; box-shadow:0 0 5px rgba(0,0,0,0.4); margin-bottom:20px; }
+    canvas#confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+    .gif { max-width:25px; border-radius:70px; margin-bottom:05px; }
+</style>
+</head>
+<body>
+
+<!-- Muzică Jazz automată -->
+<audio id="bg-music" autoplay loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-jazzcomedy.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="confetti"></canvas>
+
+<!-- SCENA 1 -->
+<div class="scene active" id="scene1" style="background:linear-gradient(135deg,#f8a1d1,#ff69b4);">
+    <h1>Tu chiar ești Nico?</h1>
+    <button onclick="goToScene(2)">Da!</button>
+    <button onclick="goToScene(4)">Nu!</button>
+</div>
+
+<!-- SCENA 2 -->
+<div class="scene" id="scene2" style="background:linear-gradient(135deg,#f8a1d1,#ff69b4);">
+    <h1>La mulți ani, Nico!</h1>
+    <img class="gif" src="chipi.gif" alt="">
+    <button class="bottom-left" onclick="goToScene(3)">Următorul</button>
+</div>
+
+<!-- SCENA 3 -->
+<div class="scene" id="scene3" style="background:linear-gradient(135deg,#f8a1d1,#ff69b4);">
+    <img src="Alex.JPG" alt="Alex.JPG">
+    <h2>By: MINE</h2>
+    <button class="bottom-left" onclick="goToScene(1)">Înapoi </button>
+</div>
+
+<!-- SCENA 4 (SECRETĂ) -->
+<div class="scene" id="scene4" style="background:linear-gradient(135deg,#a1d1f8,#69b4ff); flex-direction:column;">
+    <h1>OK :(</h1>
+    <button id="secretPlayBtn">🎵 Play Imnul Cocalarilor</button>
+</div>
+
+<script>
+// Control scene switching
+let currentScene = 1;
+function goToScene(num) {
+    document.getElementById(`scene${currentScene}`).classList.remove('active');
+    currentScene = num;
+    document.getElementById(`scene${currentScene}`).classList.add('active');
+    if (num === 2 || num === 3) startConfetti();
+    else stopConfetti();
+}
+
+// Confetti animation
+const confettiCanvas = document.getElementById('confetti');
+const ctx = confettiCanvas.getContext('2d');
+let confettiPieces = [];
+function resizeCanvas() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function createConfetti() {
+    return {
+        x: Math.random() * confettiCanvas.width,
+        y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+        size: Math.random() * 8 + 4,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        speed: Math.random() * 3 + 2,
+        rotation: Math.random() * 360,
+        rotationSpeed: Math.random() * 10 - 5
+    };
+}
+
+function updateConfetti() {
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    confettiPieces.forEach((p, i) => {
+        p.y += p.speed;
+        p.rotation += p.rotationSpeed;
+        if (p.y > confettiCanvas.height) confettiPieces[i] = createConfetti();
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
+    });
+}
+
+let confettiInterval;
+function startConfetti() {
+    confettiPieces = Array.from({ length: 150 }, createConfetti);
+    clearInterval(confettiInterval);
+    confettiInterval = setInterval(updateConfetti, 30);
+}
+function stopConfetti() {
+    clearInterval(confettiInterval);
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+}
+
+// Secret scene music
+document.getElementById('secretPlayBtn').addEventListener('click', () => {
+    window.open('https://www.youtube.com/watch?v=6pSq8Xwi5gI&list=RD6pSq8Xwi5gI&start_radio=1', '_blank');
+});
+</script>
+
+</body>
+</html>
+  
